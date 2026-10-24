@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sales BI Assistant</title>
+<style>
+:root{--bg:#f6f3ec;--card:#fffdf8;--ink:#1d2a2a;--mute:#6b7573;--line:#e2dccd;--acc:#0f5c4d;--warn:#9a5b00}
+@media(prefers-color-scheme:dark){:root{--bg:#141a19;--card:#1b2423;--ink:#e8ede9;--mute:#97a39f;--line:#2b3735;--acc:#4fc3a1;--warn:#e0a24a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Georgia,'Times New Roman',serif}
+main{max-width:860px;margin:0 auto;padding:28px 16px 64px}
+h1{font-size:1.7rem;margin:0 0 4px}
+.sub{color:var(--mute);margin:0 0 20px;font-family:system-ui,sans-serif;font-size:.9rem}
+form{display:flex;gap:8px}
+input{flex:1;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}
+button{padding:12px 18px;border:0;border-radius:8px;background:var(--acc);color:#fff;font:600 .95rem system-ui,sans-serif;cursor:pointer}
+button:disabled{opacity:.5}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 22px}
+.chip{background:transparent;color:var(--acc);border:1px solid var(--line);padding:6px 12px;font-weight:500;font-size:.82rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:14px}
+.answer{font-size:1.2rem}
+.meta{font:.78rem system-ui,sans-serif;color:var(--mute);margin-top:8px}
+.warn{color:var(--warn)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font:.9rem system-ui,sans-serif}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+th{color:var(--mute);font-weight:600;text-transform:capitalize}
+details{font:.85rem system-ui,sans-serif;color:var(--mute)}
+pre{background:var(--bg);padding:10px;border-radius:6px;overflow-x:auto;color:var(--ink)}
+h2{font:600 .8rem system-ui,sans-serif;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin:0 0 8px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Sales BI Assistant</h1>
+  <p class="sub">Ask a question in plain English. Every answer is computed by a database query, and the figures are shown below it.</p>
+  <form id="f"><input id="q" maxlength="500" placeholder="e.g. Which region generated the highest sales?" autocomplete="off" autofocus><button id="go">Ask</button></form>
+  <div class="chips" id="chips"></div>
+  <div id="out"></div>
+  <details class="card" id="dq" hidden><summary>Data quality: <span id="dqn"></span> records excluded</summary><div class="scroll" id="dqt"></div></details>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function inr(x){const n=Math.abs(x);let [w,f]=n.toFixed(2).split('.');
+  if(w.length>3){let h=w.slice(0,-3),t=w.slice(-3),p=[];while(h.length>2){p.unshift(h.slice(-2));h=h.slice(0,-2)}if(h)p.unshift(h);w=p.join(',')+','+t}
+  return (x<0?'-':'')+'₹'+w+(f==='00'?'':'.'+f)}
+function fmt(v,t){if(v===null||v===undefined)return '–';
+  if(t==='inr')return inr(v);if(t==='pct')return (v>0?'+':'')+v+'%';if(t==='int')return Number(v).toLocaleString('en-IN');return esc(v)}
+function table(rows,types){if(!rows.length)return '<p class="meta">No rows.</p>';
+  const cols=Object.keys(types||rows[0]).filter(c=>c in rows[0]||rows.some(r=>c in r));
+  const num=c=>['inr','pct','int'].includes(types[c]);
+  return '<table><thead><tr>'+cols.map(c=>`<th class="${num(c)?'num':''}">${esc(c.replace(/_/g,' '))}</th>`).join('')+'</tr></thead><tbody>'+
+    rows.map(r=>'<tr>'+cols.map(c=>`<td class="${num(c)?'num':''}">${fmt(r[c],types[c])}</td>`).join('')+'</tr>').join('')+'</tbody></table>'}
+async function ask(question){
+  $('go').disabled=true;$('out').innerHTML='<div class="card meta">Thinking…</div>';
+  try{
+    const res=await fetch('/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question})});
+    const d=await res.json();
+    if(!res.ok){$('out').innerHTML=`<div class="card warn">${esc(typeof d.detail==='string'?d.detail:'Invalid request.')}</div>`;return}
+    if(d.status!=='ok'){$('out').innerHTML=`<div class="card"><div class="answer warn">${esc(d.message)}</div><p class="meta">Try one of the example questions above.</p></div>`;return}
+    const notes=(d.notes||[]).map(n=>`<div class="meta warn">${esc(n)}</div>`).join('');
+    $('out').innerHTML=`<div class="card"><div class="answer">${esc(d.answer)}</div>
+      <div class="meta">Interpreted by: ${d.interpreted_by==='openai'?'OpenAI':'rule-based parser'} · Intent: ${esc(d.plan.intent)}</div>${notes}</div>
+      <div class="card"><h2>Supporting data</h2><div class="scroll">${table(d.rows,d.column_types)}</div>
+      <details style="margin-top:12px"><summary>SQL used</summary><pre>${esc(d.sql)}\n-- params: ${esc(JSON.stringify(d.params))}</pre></details></div>`;
+  }catch(e){$('out').innerHTML='<div class="card warn">Could not reach the server.</div>'}
+  finally{$('go').disabled=false}
+}
+$('f').addEventListener('submit',e=>{e.preventDefault();const q=$('q').value.trim();if(q)ask(q)});
+fetch('/api/meta').then(r=>r.json()).then(m=>{
+  $('chips').innerHTML=m.examples.map(x=>`<button type="button" class="chip">${esc(x)}</button>`).join('');
+  document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{$('q').value=b.textContent;ask(b.textContent)});
+  if(m.rejected_records.length){$('dq').hidden=false;$('dqn').textContent=m.rejected_records.length;
+    $('dqt').innerHTML=table(m.rejected_records,{csv_line:'int',transaction_id:'text',reason:'text'})}
+});
+</script>
+</body>
+</html>
