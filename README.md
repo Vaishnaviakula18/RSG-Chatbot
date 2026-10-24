@@ -1,28 +1,45 @@
-FILE STRUCTURE 
+## 📁 Project Structure
 
+```text
 ai-bi-assistant/
-├── app/                              backend code
+├── app/
 │   ├── __init__.py
-│   ├── main.py                       FastAPI app: /ask, /api/meta, /health, serves the UI
-│   ├── service.py                    runs a question end to end and handles errors
-│   ├── nlu.py                        OpenAI and rule-based interpreters, plus the validator
-│   ├── analytics.py                  fixed SQL queries, answer text, ₹ formatting
-│   └── db.py                         CSV cleaning, SQLite setup, read-only connection
+│   ├── main.py            # FastAPI app: /ask, /api/meta, /health, serves the UI
+│   ├── service.py         # Runs a question end to end, handles errors
+│   ├── nlu.py             # OpenAI + rule-based interpreters and plan validator
+│   ├── analytics.py       # Fixed parameterised SQL, answer text, ₹ formatting
+│   └── db.py              # CSV cleaning, SQLite setup, read-only connection
 ├── static/
-│   └── index.html                    the web page (question box, answer, table, SQL)
+│   └── index.html         # Web UI (question box, answer, table, SQL)
 ├── data/
-│   └── ai_bi_assistant_sales_data.csv   your sales data
+│   └── ai_bi_assistant_sales_data.csv
 ├── tests/
 │   ├── __init__.py
-│   ├── test_core.py                  18 tests of the logic and safety checks
-│   └── test_api.py                   4 tests of the HTTP endpoints
+│   ├── test_core.py       # Logic and safety tests
+│   └── test_api.py        # HTTP endpoint tests
 ├── docs/
-│   ├── AI_USAGE.md                   draft of your "how I used AI" write-up
-│   └── INTERVIEW_NOTES.md            cheat-sheet on RAG, agents, LangChain and so on
-├── .env.example                      template for your OpenAI key
+│   ├── AI_USAGE.md        # How AI was used during development
+│   └── INTERVIEW_NOTES.md # Concept cheat-sheet (RAG, agents, LangChain...)
+├── .env.example           # Template for your OpenAI API key
 ├── .gitignore
-├── requirements.txt                  Python packages to install
-└── README.md                         setup, architecture, limitations
+├── requirements.txt
+└── README.md
+```
+
+### File guide
+
+| File | Purpose |
+|------|---------|
+| `app/main.py` | Web API endpoints and static page hosting |
+| `app/service.py` | Orchestrates question → plan → validation → SQL → answer |
+| `app/nlu.py` | Turns questions into a JSON plan (OpenAI or rules) and validates it |
+| `app/analytics.py` | Pre-written SQL queries for each supported question type |
+| `app/db.py` | Cleans the CSV, builds SQLite, opens a read-only connection |
+| `static/index.html` | Single-page UI |
+| `tests/` | Automated tests (run with `pytest -v`) |
+| `docs/` | Write-ups for the assignment and interview preparation |
+
+> **Generated at runtime (not committed):** `.env` (your API key) and `data/sales.db` (SQLite database built from the CSV on first start).
 
 
 # Mini AI Business Intelligence Assistant
