@@ -1,3 +1,30 @@
+FILE STRUCTURE 
+
+ai-bi-assistant/
+├── app/                              backend code
+│   ├── __init__.py
+│   ├── main.py                       FastAPI app: /ask, /api/meta, /health, serves the UI
+│   ├── service.py                    runs a question end to end and handles errors
+│   ├── nlu.py                        OpenAI and rule-based interpreters, plus the validator
+│   ├── analytics.py                  fixed SQL queries, answer text, ₹ formatting
+│   └── db.py                         CSV cleaning, SQLite setup, read-only connection
+├── static/
+│   └── index.html                    the web page (question box, answer, table, SQL)
+├── data/
+│   └── ai_bi_assistant_sales_data.csv   your sales data
+├── tests/
+│   ├── __init__.py
+│   ├── test_core.py                  18 tests of the logic and safety checks
+│   └── test_api.py                   4 tests of the HTTP endpoints
+├── docs/
+│   ├── AI_USAGE.md                   draft of your "how I used AI" write-up
+│   └── INTERVIEW_NOTES.md            cheat-sheet on RAG, agents, LangChain and so on
+├── .env.example                      template for your OpenAI key
+├── .gitignore
+├── requirements.txt                  Python packages to install
+└── README.md                         setup, architecture, limitations
+
+
 # Mini AI Business Intelligence Assistant
 
 Ask sales questions in plain English; get an answer computed by a real SQL query, with the supporting figures shown.
