@@ -60,7 +60,7 @@ Without an API key the app still works using the rule-based interpreter.
 
 ## Tests
 ```bash
-pytest -v                                  # 22 tests (API tests skip if FastAPI/httpx missing)
+pytest -v                                  # 25 tests (API tests skip if FastAPI/httpx missing)
 python -m unittest discover -s tests -p "test_core.py"   # core tests with no extra installs
 ```
 
