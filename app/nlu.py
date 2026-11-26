@@ -12,6 +12,8 @@ MONTHS = {m: i + 1 for i, m in enumerate(
     ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"])}
 MONTH_RE = re.compile(r"\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|"
                       r"sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\b")
+ENTITY_RE = re.compile(r"\b(?:for|of|in|on|from)\s+(?:the\s+)?(product|region|category|channel)\s+"
+                       r"(?:named\s+|called\s+)?([a-z0-9][\w\-]*(?:\s+[a-z0-9][\w\-]*)?)")
 CATALOG_KEY = {"product": "products", "region": "regions", "category": "categories", "channel": "channels"}
 DIM_WORDS = {"product": ("product", "products", "item", "items"), "region": ("region", "regions", "area"),
              "category": ("category", "categories"), "channel": ("channel", "channels")}
