@@ -66,6 +66,19 @@ class CoreTests(unittest.TestCase):
         self.assertEqual((r["plan"]["month_a"], r["plan"]["month_b"]), ("2026-05", "2026-06"))
         self.assertEqual(r["rows"][-1]["revenue"], -107250)
 
+    def test_06c_unknown_named_value_is_refused(self):
+        r = self.ask("revenue for product Banana")
+        self.assertEqual(r["status"], "unsupported")
+        self.assertIn("Banana", r["message"])
+
+    def test_06d_named_product_filter_works(self):
+        r = self.ask("revenue for product Monitor")
+        self.assertEqual(r["plan"]["filters"], {"product": "Monitor"})
+        self.assertEqual(r["rows"][0]["revenue"], 473000)
+        r = self.ask("What is the revenue for product Monitor in May?")
+        self.assertEqual(r["plan"]["filters"]["product"], "Monitor")
+        self.assertEqual(r["plan"]["filters"]["month"], "2026-05")
+
     # --- data quality ---
     def test_07_bad_records_quarantined(self):
         self.assertEqual(self.counts, (48, 3))
@@ -126,6 +139,11 @@ class CoreTests(unittest.TestCase):
         down = self.ask("What is the total revenue?")  # llm raises -> rules
         self.assertEqual(down["interpreted_by"], "rules")
         self.assertTrue(down["notes"])
+
+    def test_16b_llm_prompt_builds(self):
+        prompt = nlu.build_system_prompt(db.get_catalog(self.conn))
+        self.assertIn("Monitor", prompt)
+        self.assertNotIn("{catalog}", prompt)
 
     def test_17_currency_format(self):
         self.assertEqual(inr(1439200), "₹14,39,200")
