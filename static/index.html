@@ -5,74 +5,139 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sales BI Assistant</title>
 <style>
-:root{--bg:#f6f3ec;--card:#fffdf8;--ink:#1d2a2a;--mute:#6b7573;--line:#e2dccd;--acc:#0f5c4d;--warn:#9a5b00}
-@media(prefers-color-scheme:dark){:root{--bg:#141a19;--card:#1b2423;--ink:#e8ede9;--mute:#97a39f;--line:#2b3735;--acc:#4fc3a1;--warn:#e0a24a}}
+:root{--bg:#f4f1ea;--card:#fffefb;--ink:#17262a;--mute:#6a7775;--line:#e4ded0;--acc:#0f6b57;--accs:#e1f0ea;--pos:#13795b;--neg:#b4412f;--bar:#c9dcd5;--sh:0 1px 2px rgba(20,40,35,.06),0 8px 24px rgba(20,40,35,.06)}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1514;--card:#162120;--ink:#e7eeea;--mute:#93a29e;--line:#263433;--acc:#4fd1a8;--accs:#17332c;--pos:#4fd1a8;--neg:#ff8a73;--bar:#2a4540;--sh:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3)}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Georgia,'Times New Roman',serif}
-main{max-width:860px;margin:0 auto;padding:28px 16px 64px}
-h1{font-size:1.7rem;margin:0 0 4px}
-.sub{color:var(--mute);margin:0 0 20px;font-family:system-ui,sans-serif;font-size:.9rem}
-form{display:flex;gap:8px}
-input{flex:1;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}
-button{padding:12px 18px;border:0;border-radius:8px;background:var(--acc);color:#fff;font:600 .95rem system-ui,sans-serif;cursor:pointer}
-button:disabled{opacity:.5}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 22px}
-.chip{background:transparent;color:var(--acc);border:1px solid var(--line);padding:6px 12px;font-weight:500;font-size:.82rem}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:14px}
-.answer{font-size:1.2rem}
-.meta{font:.78rem system-ui,sans-serif;color:var(--mute);margin-top:8px}
-.warn{color:var(--warn)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif}
+main{max-width:920px;margin:0 auto;padding:20px 16px 56px}
+.hero{background:linear-gradient(135deg,#0a4a3d,#15876d);color:#fff;border-radius:20px;padding:26px 24px 22px;box-shadow:var(--sh)}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.18);display:grid;place-items:center;font:700 22px Georgia,serif}
+h1{margin:0;font:600 1.7rem/1.15 Georgia,'Iowan Old Style',serif;letter-spacing:-.01em}
+.sub{margin:10px 0 18px;color:rgba(255,255,255,.82);font-size:.95rem;max-width:620px}
+form{display:flex;gap:8px;background:#fff;border-radius:14px;padding:6px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+input{flex:1;min-width:0;border:0;outline:0;background:transparent;padding:12px 12px;font:inherit;color:#17262a}
+input::placeholder{color:#8a9795}
+button{font:600 .95rem system-ui,sans-serif;cursor:pointer}
+#go{border:0;border-radius:10px;background:#0f6b57;color:#fff;padding:0 22px;transition:filter .15s}
+#go:hover{filter:brightness(1.12)}#go:disabled{opacity:.5;cursor:wait}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:6px 13px;font-size:.8rem;font-weight:500;transition:background .15s}
+.chip:hover{background:rgba(255,255,255,.24)}
+#out{margin-top:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:14px;box-shadow:var(--sh);animation:rise .35s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.answer{border-left:5px solid var(--acc)}
+.answer p{margin:0;font:1.25rem/1.45 Georgia,'Iowan Old Style',serif}
+.warn{color:var(--neg)}
+.note{margin-top:8px;font-size:.8rem;color:#a86a00}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:14px}
+.stat{background:var(--accs);border-radius:12px;padding:10px 12px}
+.stat b{display:block;font-size:1.15rem}.stat span{font-size:.72rem;color:var(--mute);text-transform:uppercase;letter-spacing:.05em}
+h2{margin:0 0 12px;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mute)}
+.bar{display:grid;grid-template-columns:minmax(80px,130px) 1fr auto;gap:10px;align-items:center;margin:8px 0;font-size:.9rem}
+.bt{height:12px;background:var(--accs);border-radius:99px;overflow:hidden}
+.bt i,.col i{display:block;background:var(--bar);border-radius:99px;animation:grow .7s ease both}
+.bt i{height:100%;width:var(--w)}
+.top i{background:var(--acc)}
+@keyframes grow{from{width:0}}
+.cols{display:flex;gap:10px;align-items:flex-end;height:190px}
+.col{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;font-size:.75rem;color:var(--mute)}
+.col i{width:100%;max-width:56px;height:var(--h);border-radius:8px 8px 3px 3px;animation:up .7s ease both}
+@keyframes up{from{height:0}}
+.col b{color:var(--ink);font-size:.78rem;margin-bottom:4px}.col span{margin-top:6px}
 .scroll{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font:.9rem system-ui,sans-serif}
-th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
-td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
-th{color:var(--mute);font-weight:600;text-transform:capitalize}
-details{font:.85rem system-ui,sans-serif;color:var(--mute)}
-pre{background:var(--bg);padding:10px;border-radius:6px;overflow-x:auto;color:var(--ink)}
-h2{font:600 .8rem system-ui,sans-serif;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin:0 0 8px}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{color:var(--mute);font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em}
+tbody tr:hover{background:var(--accs)}tbody tr:last-child td{border-bottom:0}
+.n{text-align:right;font-variant-numeric:tabular-nums}.pos{color:var(--pos);font-weight:600}.neg{color:var(--neg);font-weight:600}
+details{margin-top:12px;font-size:.85rem;color:var(--mute)}summary{cursor:pointer}
+pre{background:var(--bg);border-radius:10px;padding:12px;overflow-x:auto;color:var(--ink);font:.8rem/1.5 ui-monospace,Menlo,monospace}
+.dq summary{font-weight:600;color:var(--ink)}
+.pill{background:var(--accs);color:var(--acc);border-radius:99px;padding:1px 9px;margin-left:6px;font-size:.8rem}
+.dots{display:flex;gap:6px;padding:4px 0}.dots i{width:9px;height:9px;border-radius:50%;background:var(--acc);animation:p 1s infinite}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes p{50%{opacity:.25;transform:scale(.7)}}
+.foot{text-align:center;color:var(--mute);font-size:.78rem;margin-top:22px}
+@media(max-width:560px){h1{font-size:1.4rem}.bar{grid-template-columns:80px 1fr auto}.answer p{font-size:1.1rem}}
 </style>
 </head>
 <body>
 <main>
-  <h1>Sales BI Assistant</h1>
-  <p class="sub">Ask a question in plain English. Every answer is computed by a database query, and the figures are shown below it.</p>
-  <form id="f"><input id="q" maxlength="500" placeholder="e.g. Which region generated the highest sales?" autocomplete="off" autofocus><button id="go">Ask</button></form>
-  <div class="chips" id="chips"></div>
+  <section class="hero">
+    <div class="brand"><div class="logo">₹</div><h1>Sales BI Assistant</h1></div>
+    <p class="sub">Ask a question in plain English. Every answer is computed by a database query, and the figures are shown below it.</p>
+    <form id="f"><input id="q" maxlength="500" placeholder="e.g. Which region generated the highest sales?" autocomplete="off" autofocus><button id="go">Ask</button></form>
+    <div class="chips" id="chips"></div>
+  </section>
   <div id="out"></div>
-  <details class="card" id="dq" hidden><summary>Data quality: <span id="dqn"></span> records excluded</summary><div class="scroll" id="dqt"></div></details>
+  <details class="card dq" id="dq" hidden><summary>Data quality<span class="pill" id="dqn"></span> records excluded</summary><div class="scroll" id="dqt" style="margin-top:10px"></div></details>
+  <p class="foot">Answers come from fixed SQL on a read-only database. The AI never writes SQL.</p>
 </main>
 <script>
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const mLabel = m => /^\d{4}-\d{2}$/.test(m) ? MON[+m.slice(5) - 1] + ' ' + m.slice(2, 4) : m;
+const HEAD = {mom_change_pct:'MoM change', change_pct:'Change', csv_line:'CSV line', transaction_id:'Transaction'};
 function inr(x){const n=Math.abs(x);let [w,f]=n.toFixed(2).split('.');
   if(w.length>3){let h=w.slice(0,-3),t=w.slice(-3),p=[];while(h.length>2){p.unshift(h.slice(-2));h=h.slice(0,-2)}if(h)p.unshift(h);w=p.join(',')+','+t}
   return (x<0?'-':'')+'₹'+w+(f==='00'?'':'.'+f)}
+const short = v => Math.abs(v)>=1e5 ? '₹'+(v/1e5).toFixed(2).replace(/\.?0+$/,'')+'L' : inr(v);
 function fmt(v,t){if(v===null||v===undefined)return '–';
-  if(t==='inr')return inr(v);if(t==='pct')return (v>0?'+':'')+v+'%';if(t==='int')return Number(v).toLocaleString('en-IN');return esc(v)}
-function table(rows,types){if(!rows.length)return '<p class="meta">No rows.</p>';
-  const cols=Object.keys(types||rows[0]).filter(c=>c in rows[0]||rows.some(r=>c in r));
-  const num=c=>['inr','pct','int'].includes(types[c]);
-  return '<table><thead><tr>'+cols.map(c=>`<th class="${num(c)?'num':''}">${esc(c.replace(/_/g,' '))}</th>`).join('')+'</tr></thead><tbody>'+
-    rows.map(r=>'<tr>'+cols.map(c=>`<td class="${num(c)?'num':''}">${fmt(r[c],types[c])}</td>`).join('')+'</tr>').join('')+'</tbody></table>'}
+  if(t==='inr')return inr(v);
+  if(t==='pct')return `<span class="${v>0?'pos':v<0?'neg':''}">${v>0?'+':''}${v}%</span>`;
+  if(t==='int')return Number(v).toLocaleString('en-IN');return esc(v)}
+function table(rows,types){if(!rows.length)return '<p style="color:var(--mute)">No rows.</p>';
+  const cols=Object.keys(types);const num=c=>['inr','pct','int'].includes(types[c]);
+  return '<table><thead><tr>'+cols.map(c=>`<th class="${num(c)?'n':''}">${esc(HEAD[c]||c.replace(/_/g,' '))}</th>`).join('')+'</tr></thead><tbody>'+
+    rows.map(r=>'<tr>'+cols.map(c=>`<td class="${num(c)?'n':''}">${c==='month'?esc(mLabel(r[c])):fmt(r[c],types[c])}</td>`).join('')+'</tr>').join('')+'</tbody></table>'}
+function chart(d){
+  const i=d.plan.intent, rows=d.rows;
+  if(!rows.length||i==='total_revenue')return '';
+  let items;
+  if(i==='month_comparison')items=rows.slice(0,2).map(r=>({l:mLabel(r.month),v:r.revenue}));
+  else if(i==='monthly_trend')items=rows.map(r=>({l:mLabel(r.month),v:r.revenue}));
+  else{const k=Object.keys(d.column_types)[0];items=rows.map(r=>({l:r[k],v:r.revenue}))}
+  const max=Math.max(...items.map(x=>x.v),1), top=Math.max(...items.map(x=>x.v));
+  if(i==='monthly_trend'||i==='month_comparison')
+    return '<div class="card"><h2>Revenue chart</h2><div class="cols">'+items.map(x=>
+      `<div class="col ${x.v===top?'top':''}"><b>${short(x.v)}</b><i style="--h:${Math.max(x.v/max*100,2)}%"></i><span>${esc(x.l)}</span></div>`).join('')+'</div></div>';
+  return '<div class="card"><h2>Revenue chart</h2>'+items.map(x=>
+    `<div class="bar ${x.v===top?'top':''}"><span>${esc(x.l)}</span><span class="bt"><i style="--w:${Math.max(x.v/max*100,2)}%"></i></span><b>${short(x.v)}</b></div>`).join('')+'</div>';
+}
+function stats(d){
+  if(d.plan.intent!=='total_revenue'||!d.rows.length)return '';
+  const r=d.rows[0];
+  return '<div class="stats">'+[['Revenue',inr(r.revenue)],['Orders',r.orders],['Units',r.units],['Discounts',inr(r.discounts)]]
+    .map(([a,b])=>`<div class="stat"><b>${esc(b)}</b><span>${a}</span></div>`).join('')+'</div>';
+}
+function render(d){
+  if(d.status!=='ok'){
+    const ex=(d.examples||[]).map(x=>`<button type="button" class="chip" style="color:var(--acc);border-color:var(--line);background:transparent">${esc(x)}</button>`).join('');
+    return `<div class="card"><p style="margin:0;font-size:1.1rem" class="warn">${esc(d.message)}</p><div class="chips">${ex}</div></div>`;
+  }
+  const notes=(d.notes||[]).map(n=>`<div class="note">${esc(n)}</div>`).join('');
+  return `<div class="card answer"><p>${esc(d.answer)}</p>${stats(d)}${notes}</div>${chart(d)}
+    <div class="card"><h2>Supporting data</h2><div class="scroll">${table(d.rows,d.column_types)}</div>
+    <details><summary>SQL used</summary><pre>${esc(d.sql)}\n-- params: ${esc(JSON.stringify(d.params))}</pre></details></div>`;
+}
 async function ask(question){
-  $('go').disabled=true;$('out').innerHTML='<div class="card meta">Thinking…</div>';
+  $('go').disabled=true;$('out').innerHTML='<div class="card"><div class="dots"><i></i><i></i><i></i></div></div>';
   try{
     const res=await fetch('/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question})});
     const d=await res.json();
     if(!res.ok){$('out').innerHTML=`<div class="card warn">${esc(typeof d.detail==='string'?d.detail:'Invalid request.')}</div>`;return}
-    if(d.status!=='ok'){$('out').innerHTML=`<div class="card"><div class="answer warn">${esc(d.message)}</div><p class="meta">Try one of the example questions above.</p></div>`;return}
-    const notes=(d.notes||[]).map(n=>`<div class="meta warn">${esc(n)}</div>`).join('');
-    $('out').innerHTML=`<div class="card"><div class="answer">${esc(d.answer)}</div>
-      <div class="meta">Interpreted by: ${d.interpreted_by==='openai'?'OpenAI':'rule-based parser'} · Intent: ${esc(d.plan.intent)}</div>${notes}</div>
-      <div class="card"><h2>Supporting data</h2><div class="scroll">${table(d.rows,d.column_types)}</div>
-      <details style="margin-top:12px"><summary>SQL used</summary><pre>${esc(d.sql)}\n-- params: ${esc(JSON.stringify(d.params))}</pre></details></div>`;
+    $('out').innerHTML=render(d);
+    document.querySelectorAll('#out .chip').forEach(b=>b.onclick=()=>{$('q').value=b.textContent;ask(b.textContent)});
   }catch(e){$('out').innerHTML='<div class="card warn">Could not reach the server.</div>'}
   finally{$('go').disabled=false}
 }
 $('f').addEventListener('submit',e=>{e.preventDefault();const q=$('q').value.trim();if(q)ask(q)});
 fetch('/api/meta').then(r=>r.json()).then(m=>{
   $('chips').innerHTML=m.examples.map(x=>`<button type="button" class="chip">${esc(x)}</button>`).join('');
-  document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{$('q').value=b.textContent;ask(b.textContent)});
+  document.querySelectorAll('#chips .chip').forEach(b=>b.onclick=()=>{$('q').value=b.textContent;ask(b.textContent)});
   if(m.rejected_records.length){$('dq').hidden=false;$('dqn').textContent=m.rejected_records.length;
     $('dqt').innerHTML=table(m.rejected_records,{csv_line:'int',transaction_id:'text',reason:'text'})}
 });
