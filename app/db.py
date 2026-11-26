@@ -93,8 +93,9 @@ def build_database(csv_path=CSV_PATH, db_path=DB_PATH):
     return len(good), len(bad)
 
 
-def connect_readonly(db_path=DB_PATH):
+def connect_readonly(db_path=DB_None):
     """Read-only connection: any INSERT/UPDATE/DELETE/DROP raises an error."""
+    db_path=db_path or DB_PATH
     uri = f"{Path(db_path).resolve().as_uri()}?mode=ro"
     conn = sqlite3.connect(uri, uri=True)
     conn.row_factory = sqlite3.Row
